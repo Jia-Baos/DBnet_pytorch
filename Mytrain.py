@@ -23,7 +23,7 @@ checkpoints_dir = "D:\\PythonProject\\DBnet_pytorch\\checkpoints"
 
 # 加载训练数据集
 train_dataset = MyDataSet(data_dir, mode='train')
-train_dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=0, drop_last=False)
+train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=0, drop_last=False)
 
 # 加载测试数据集
 val_dataset = MyDataSet(data_dir, mode='test')
@@ -79,7 +79,7 @@ def train(dataloader, model, optimizer):
 
 # 定义测试函数
 def val(dataloader, model):
-    model.val()
+    model.eval()
     val_batch_loss = 0.0
     alpha, beta = 10.0, 10.0
     with torch.no_grad():
@@ -107,7 +107,7 @@ def val(dataloader, model):
 # 开始训练
 if __name__ == '__main__':
     epochs = 5
-    best_loss = 10
+    best_loss = 20
 
     if not os.path.exists(checkpoints_dir):
         os.mkdir(checkpoints_dir)

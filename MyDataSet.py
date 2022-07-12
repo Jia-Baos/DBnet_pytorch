@@ -11,6 +11,7 @@
 import os
 import cv2
 import numpy as np
+import torch
 from PIL import Image
 from Myutils import shrink, make_threshold_map
 from torch.utils.data import Dataset, DataLoader
@@ -115,8 +116,15 @@ class MyDataSet(Dataset):
         # img dimension: 224 * 224 * 3 -> 3 * 224 * 224
         img = np.transpose(img, (2, 0, 1))
         img = np.array(img / 255, dtype=np.float32)
+        probability_map = np.array(probability_map / 255, dtype=np.float32)
+        threshold_map = np.array(threshold_map / 255, dtype=np.float32)
+
         probability_map = np.expand_dims(probability_map, axis=0)
         threshold_map = np.expand_dims(threshold_map, axis=0)
+
+        img = torch.tensor(img, dtype=torch.float)
+        probability_map = torch.tensor(probability_map, dtype=torch.float)
+        threshold_map = torch.tensor(threshold_map, dtype=torch.float)
         return img, probability_map, threshold_map
 
 
@@ -136,15 +144,19 @@ if __name__ == '__main__':
         print(real_img.size())
         print(real_probability_map.size())
         print(real_threshold_map.size())
-        real_img = real_img.numpy()
-        real_probability_map = real_probability_map.numpy()
-        real_threshold_map = real_threshold_map.numpy()
+        print(real_img.dtype)
+        print(real_probability_map.dtype)
+        print(real_threshold_map.dtype)
 
-        show_real_img = cv2.merge([real_img[0], real_img[1], real_img[2]])
-        show_real_probability_map = cv2.merge([real_probability_map[0], real_probability_map[0], real_probability_map[0]])
-        show_real_threshold_map = cv2.merge([real_threshold_map[0], real_threshold_map[0], real_threshold_map[0]])
-        cv2.imshow("test1", show_real_img)
-        cv2.imshow("test2", show_real_probability_map)
-        cv2.imshow("test3", show_real_threshold_map)
-        cv2.waitKey(0)
+        # real_img = real_img.numpy()
+        # real_probability_map = real_probability_map.numpy()
+        # real_threshold_map = real_threshold_map.numpy()
+        #
+        # show_real_img = cv2.merge([real_img[0], real_img[1], real_img[2]])
+        # show_real_probability_map = cv2.merge([real_probability_map[0], real_probability_map[0], real_probability_map[0]])
+        # show_real_threshold_map = cv2.merge([real_threshold_map[0], real_threshold_map[0], real_threshold_map[0]])
+        # cv2.imshow("test1", show_real_img)
+        # cv2.imshow("test2", show_real_probability_map)
+        # cv2.imshow("test3", show_real_threshold_map)
+        # cv2.waitKey(0)
 

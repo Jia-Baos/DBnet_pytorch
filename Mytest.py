@@ -10,18 +10,18 @@ import torch.nn as nn
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 
-from MyNet import Model
+from MyNet import MyModel
 from MyDataSet import MyDataSet
 
 data_dir = "D:\\PythonProject\\DBnet_pytorch\\data"
 checkpoints_dir = "D:\\PythonProject\\DBnet_pytorch\\checkpoints"
 
-dataset = MyDataSet(data_dir, mode='train')
+dataset = MyDataSet(data_dir, mode='test')
 dataloader = DataLoader(dataset, batch_size=2, shuffle=True, num_workers=0, drop_last=False)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-model = Model()
+model = MyModel()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
 

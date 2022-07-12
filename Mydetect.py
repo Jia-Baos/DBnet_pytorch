@@ -23,8 +23,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # 调用在MyNet.py中定义好的模型并加载对应的训练权重
 model = MyModel()
-# model.load_state_dict(torch.load("D:\\PythonProject\\DBnet_pytorch\\checkpoints\\best_model.pt"))
-
+model.load_state_dict(torch.load("D:\\PythonProject\\DBnet_pytorch\\checkpoints\\best_model.pt"))
 
 if __name__ == '__main__':
     model.eval()
@@ -33,20 +32,49 @@ if __name__ == '__main__':
         for image in image_list:
             image_path = os.path.join(data_dir, image)
             img = Image.open(image_path).convert('RGB')
-            img = img.resize(size=(224, 224), resample=2, box=None, reducing_gap=None)
+
+            # img = img.resize(size=(224, 224), resample=2, box=None, reducing_gap=None)
+            new_width = int(img.width / 32) * 32
+            new_height = int(img.height / 32) * 32
+            img = img.resize(size=(new_width, new_height), resample=2)
+
             img = np.array(img)
             img = np.array(img / 255, dtype=np.float32)
-            img_torch = torch.from_numpy(img)
+            img_torch = torch.tensor(img, dtype=torch.float)
             img_torch = torch.permute(img_torch, (2, 0, 1))
             img_torch = torch.unsqueeze(img_torch, dim=0)
+            print("img's size: ", img_torch.size())
 
             probability_map, threshold_map, approximate_binary_map = model(img_torch)
 
+            # real_probability_map = torch.permute(probability_map[0], (1, 2, 0))
+            # real_threshold_map = torch.permute(threshold_map[0], (1, 2, 0))
+            # real_approximate_binary_map = torch.permute(approximate_binary_map[0], (1, 2, 0))
+            #
+            # real_probability_map = np.array(real_probability_map)
+            # real_threshold_map = np.array(real_threshold_map)
+            # real_approximate_binary_map = np.array(real_approximate_binary_map)
+            #
+            # real_probability_map = np.array(real_approximate_binary_map * 255, dtype=np.uint8)
+            # real_threshold_map = np.array(real_threshold_map * 255, dtype=np.uint8)
+            # real_approximate_binary_map = np.array(real_approximate_binary_map * 255, dtype=np.uint8)
+            #
+            # print(real_probability_map.shape)
+            # print(real_threshold_map.shape)
+            # print(real_approximate_binary_map.shape)
+            # cv2.imshow("real_probability_map", real_probability_map)
+            # cv2.imshow("real_threshold_map", real_threshold_map)
+            # cv2.imshow("real_approximate_binary_map", real_approximate_binary_map)
+            # cv2.waitKey(0)
+
             # 进行反归一化，用于显示图片
+            img = np.array(img)
             img = np.array(img * 255, dtype=np.uint8)
 
             # 将approximate_binary_map先转化为ndarray类型，再进行二值化
-            approximate_binary_map_numpy = approximate_binary_map.numpy()
+            approximate_binary_map_numpy = torch.permute(approximate_binary_map[0], (1,2,0))
+            approximate_binary_map_numpy = approximate_binary_map_numpy.numpy()
+            print(approximate_binary_map_numpy.shape)
             approximate_binary_map_numpy[approximate_binary_map_numpy > 0.2] = 1
             approximate_binary_map_numpy[approximate_binary_map_numpy <= 0.2] = 0
             # 进行反归一化，用于显示图片
@@ -109,3 +137,4 @@ if __name__ == '__main__':
                     cv2.line(img, pt1=(box[j][0], box[j][1]),
                              pt2=(box[(j + 1) % 4][0], box[(j + 1) % 4][1]), color=(0, 0, 255), thickness=2)
             cv2.imshow('predict', img)
+            cv2.waitKey(0)

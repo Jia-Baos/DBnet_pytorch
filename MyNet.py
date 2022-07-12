@@ -145,17 +145,20 @@ class MyModel(nn.Module):
         x = self.bn(x)
         c1 = self.relu(x)
         x = self.pool1(c1)
+        print(x.size())
 
         # 进入第一个block
         x = self.bottleneck1_1(x)
         x = self.bottleneck1_2(x)
         c2 = self.bottleneck1_3(x)
+        print(c2.size())
 
         # 进入第二个block
         x = self.bottleneck2_1(c2)
         x = self.bottleneck2_2(x)
         x = self.bottleneck2_3(x)
         c3 = self.bottleneck2_4(x)
+        print(c3.size())
 
         # 进入第三个block
         x = self.bottleneck3_1(c3)
@@ -164,11 +167,13 @@ class MyModel(nn.Module):
         x = self.bottleneck3_4(x)
         x = self.bottleneck3_5(x)
         c4 = self.bottleneck3_6(x)
+        print(c4.size())
 
         # 进入第四个block
         x = self.bottleneck4_1(c4)
         x = self.bottleneck4_2(x)
         c5 = self.bottleneck4_3(x)
+        print(c5.size())
 
         # 特征图第一层
         m5 = self.conv_c5_m5(c5)
@@ -211,6 +216,7 @@ class MyModel(nn.Module):
 
 
 if __name__ == '__main__':
+    # 测试计划，直接利用224*224的图像测试，使得网络过拟合，查看是否可以准确找到边缘，之后再跑各种数据集
     x = torch.rand((4, 3, 224, 224), dtype=torch.float)
     model = MyModel()
     real_probability_maps, real_threshold_maps, real_approximate_binary_maps = model(x)
